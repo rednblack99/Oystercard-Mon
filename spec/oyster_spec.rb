@@ -30,6 +30,12 @@ RSpec.describe Oystercard do
     end
   end
 
+  it 'should remember entry station after touch in' do
+    subject.top_up(20)
+    subject.touch_in("Aldgate East")
+    expect(subject.entry_station).to eq "Aldgate East" 
+  end
+
   describe '#touch_out' do
     it 'should set status to not in journey when the user touches out' do
       subject.top_up(20)
@@ -41,6 +47,13 @@ RSpec.describe Oystercard do
       subject.top_up(20)
       subject.touch_in
       expect { subject.touch_out }.to change { subject.balance }.by(-Oystercard::MIN_FARE)
+    end
+
+    it 'should set entry station to nil upon touch out' do
+      subject.top_up(20)
+      subject.touch_in
+      subject.touch_out
+      expect(subject.entry_station).to be nil
     end
   end
 
