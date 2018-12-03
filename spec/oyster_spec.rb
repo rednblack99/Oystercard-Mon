@@ -20,12 +20,25 @@ RSpec.describe Oystercard do
 
   describe '#touch_in' do
     it 'should set status to in journey when the user touches in' do
+      subject.top_up(20)
       expect(subject.touch_in).to eq true
     end
+
+    it 'should not let user touch in without sufficient balance' do
+      expect {subject.touch_in}.to raise_error 'Insufficient balance. GET RICH BRO!'
+    end
+
+    it 'should raise error if user tries to touch in twice' do
+      subject.top_up(20)
+      subject.touch_in
+      expect {subject.touch_in}.to raise_error 'User already in journey' 
+    end
+
   end
 
   describe '#touch_out' do
     it 'should set status to not in journey when the user touches out' do
+      subject.top_up(20)
       subject.touch_in
       expect(subject.touch_out).to eq false
     end
@@ -34,4 +47,5 @@ RSpec.describe Oystercard do
   it 'when initialized card starts not in journey' do
     expect(subject.in_journey).to eq false
   end
+
 end
