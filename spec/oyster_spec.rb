@@ -13,11 +13,6 @@ RSpec.describe Oystercard do
     expect { subject.top_up(::MAX_BALANCE + 1) }.to raise_error { 'Maximum balance exceeded' }
   end
 
-  it 'should deduct an amount from the card' do
-    subject.top_up(20)
-    expect(subject.deduct(5)).to eq 15
-  end
-
   describe '#touch_in' do
     it 'should set status to in journey when the user touches in' do
       subject.top_up(20)
@@ -25,15 +20,14 @@ RSpec.describe Oystercard do
     end
 
     it 'should not let user touch in without sufficient balance' do
-      expect {subject.touch_in}.to raise_error 'Insufficient balance. GET RICH BRO!'
+      expect { subject.touch_in }.to raise_error 'Insufficient balance. GET RICH BRO!'
     end
 
     it 'should raise error if user tries to touch in twice' do
       subject.top_up(20)
       subject.touch_in
-      expect {subject.touch_in}.to raise_error 'User already in journey' 
+      expect { subject.touch_in }.to raise_error 'User already in journey'
     end
-
   end
 
   describe '#touch_out' do
@@ -42,10 +36,15 @@ RSpec.describe Oystercard do
       subject.touch_in
       expect(subject.touch_out).to eq false
     end
+
+    it 'should reduce the balance by the minimum fare' do
+      subject.top_up(20)
+      subject.touch_in
+      expect { subject.touch_out }.to change { subject.balance }.by(-Oystercard::MIN_FARE)
+    end
   end
 
   it 'when initialized card starts not in journey' do
     expect(subject.in_journey).to eq false
   end
-
 end
